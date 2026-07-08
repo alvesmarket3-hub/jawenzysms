@@ -3,109 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yönetici Kontrol Paneli - VerifyPro</title>
+    <title>VerifyPro - Global Master Admin Control</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 11pt; }
-        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
-        .admin-header { background-color: #141b2d; border-bottom: 2px solid #ff5c5c; padding: 20px; border-radius: 6px; margin-bottom: 30px; }
-        .title { font-size: 16pt; font-weight: bold; color: #ff5c5c; display: flex; align-items: center; }
-        .admin-table { width: 100%; border-collapse: collapse; background-color: #141b2d; border-radius: 6px; overflow: hidden; margin-top: 15px; }
-        .admin-table th, .admin-table td { padding: 14px; text-align: left; border-bottom: 1px solid #1f2940; }
-        .admin-table th { background-color: #1f2940; color: #ff5c5c; font-weight: bold; }
-        .admin-input { background: #0b0f19; border: 1px solid #2e3b52; color: #fff; padding: 8px 12px; border-radius: 4px; width: 130px; font-weight: bold; font-size: 11pt; }
-        .admin-input:focus { border-color: #ff5c5c; outline: none; }
-        .admin-btn { background-color: #ff5c5c; border: none; color: white; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .admin-btn:hover { background-color: #ff3333; }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 9pt; font-weight: bold; }
-        .status-waiting { background-color: rgba(240, 173, 78, 0.2); color: #f0ad4e; border: 1px solid #f0ad4e; }
-        .status-completed { background-color: rgba(92, 184, 92, 0.2); color: #5cb85c; border: 1px solid #5cb85c; }
+        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 10.5pt; }
+        .container { max-width: 1250px; margin: 30px auto; padding: 20px; }
+        .panel-header { background-color: #141b2d; border-left: 5px solid #ff5c5c; padding: 20px; border-radius: 4px; margin-bottom: 30px; }
+        .section-title { font-size: 14pt; font-weight: bold; margin: 30px 0 15px 0; color: #ff5c5c; border-bottom: 1px solid #1f2940; padding-bottom: 8px; }
+        
+        .admin-table { width: 100%; border-collapse: collapse; background-color: #141b2d; border-radius: 6px; overflow: hidden; margin-bottom: 30px; }
+        .admin-table th, .admin-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #1f2940; }
+        .admin-table th { background-color: #1f2940; color: #ff5c5c; }
+        
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 9pt; }
+        .btn-danger { background-color: #d9534f; color: white; }
+        .btn-success { background-color: #5cb85c; color: white; }
+        .btn-warn { background-color: #f0ad4e; color: white; }
+        
+        .inp { background: #0b0f19; border: 1px solid #2e3b52; color: #fff; padding: 6px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <div class="admin-header">
-        <div class="title">🛠️ VerifyPro | CANLI SMS SİPARİŞ YÖNETİMİ PANELİ</div>
-        <div style="font-size:9.5pt; color:#a1a8b5; margin-top:5px;">Müşterilerin oluşturduğu SMS talepleri buraya anlık düşer. Yazdığınız kodlar kalıcı olarak veritabanına işlenir.</div>
+    <div class="panel-header">
+        <div style="font-size:16pt; font-weight:bold; color:#ff5c5c;">🛠️ VERIFYPRO CENTRAL EXECUTIVE PANEL</div>
+        <div style="color:#a1a8b5; font-size:9.5pt; margin-top:4px;">Tüm kullanıcı üyeliklerini, banlama işlemlerini, bakiyeleri ve SMS onay isteklerini buradan anlık yönetin.</div>
     </div>
 
+    <div class="section-title">👥 Kayıtlı Üyelerin Yönetimi (Müşteri Listesi)</div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Üye ID</th>
+                <th>E-Posta Adresi</th>
+                <th>Mevcut Bakiye (₺)</th>
+                <th>Durum</th>
+                <th>Bakiye Değiştir</th>
+                <th>Hesap Aksiyonları</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+    </table>
+
+    <div class="section-title">📱 Gelen Canlı SMS Talepleri & Kod İletme</div>
     <table class="admin-table">
         <thead>
             <tr>
                 <th>Talep ID</th>
+                <th>Müşteri</th>
                 <th>Platform</th>
-                <th>Sistem Numarası</th>
+                <th>Atanan Numara</th>
                 <th>İstek Saati</th>
                 <th>Durum</th>
-                <th>SMS Onay Kodu Gir</th>
+                <th>SMS Kodu Yaz</th>
                 <th>Eylem</th>
             </tr>
         </thead>
-        <tbody id="adminTableBody">
-            <tr><td colspan="7" style="text-align:center; color:#a1a8b5;">Siparişler yükleniyor...</td></tr>
-        </tbody>
+        <tbody id="ordersTableBody"></tbody>
     </table>
 </div>
 
 <script>
-    // Sayfa açıldığında ve her 2 saniyede bir sipariş listesini yenile
-    loadAdminOrders();
-    setInterval(loadAdminOrders, 2000);
+    // Canlı Senkronizasyon Döngüsü
+    initAdmin();
+    setInterval(initAdmin, 2500);
 
-    async function loadAdminOrders() {
+    function initAdmin() {
+        loadUsers();
+        loadOrders();
+    }
+
+    async function loadUsers() {
         try {
-            const res = await fetch('/api/orders');
+            const res = await fetch('/api/admin/users');
             const data = await res.json();
-            if(!data.success) return;
-
-            const adminBody = document.getElementById('adminTableBody');
-            adminBody.innerHTML = '';
-
-            if(data.orders.length === 0) {
-                adminBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#a1a8b5; padding:30px;">Henüz sistemde oluşturulmuş hiçbir SMS isteği yok.</td></tr>';
-                return;
-            }
-
-            data.orders.forEach(o => {
-                const statusBadge = o.status === 'Waiting' 
-                    ? `<span class="status-badge status-waiting">KOD BEKLİYOR</span>` 
-                    : `<span class="status-badge status-completed">TAMAMLANDI</span>`;
-
-                adminBody.innerHTML += `
+            const body = document.getElementById('usersTableBody');
+            body.innerHTML = '';
+            
+            data.users.forEach(u => {
+                const banLabel = u.isBanned ? '<span style="color:#d9534f; font-weight:bold;">BANLI</span>' : '<span style="color:#5cb85c; font-weight:bold;">AKTİF</span>';
+                const banBtnText = u.isBanned ? 'Yasağı Kaldır' : 'Banla';
+                
+                body.innerHTML += `
                     <tr>
-                        <td style="font-weight:bold; color:#a1a8b5;">${o.id}</td>
-                        <td style="font-weight:bold; color:#00adb5;">${o.serviceName}</td>
-                        <td style="font-size:12pt; letter-spacing:1px; font-weight:bold;">${o.number}</td>
-                        <td>${o.date || '--:--'}</td>
-                        <td>${statusBadge}</td>
+                        <td>${u.id}</td>
+                        <td style="font-weight:bold; color:#00adb5;">${u.email}</td>
+                        <td><span style="font-size:11pt; color:#5cb85c; font-weight:bold;">${u.balance.toFixed(2)} ₺</span></td>
+                        <td>${banLabel}</td>
                         <td>
-                            <input type="text" id="input-${o.id}" class="admin-input" value="${o.smsCode || ''}" placeholder="SMS Kodu">
+                            <input type="number" id="bal-${u.id}" class="inp" style="width:90px;" value="${u.balance}">
+                            <button class="btn btn-success" onclick="updateBalance('${u.id}')">Güncelle</button>
                         </td>
                         <td>
-                            <button class="admin-btn" onclick="submitCode('${o.id}')">Kodu Gönder</button>
+                            <button class="btn btn-warn" onclick="toggleBan('${u.id}')">${banBtnText}</button>
+                            <button class="btn btn-danger" onclick="deleteUser('${u.id}')">Sil</button>
                         </td>
                     </tr>
                 `;
             });
-        } catch(e){ console.error("Tablo yükleme hatası:", e); }
+        } catch(e){}
+    }
+
+    async function loadOrders() {
+        try {
+            const res = await fetch('/api/orders');
+            const data = await res.json();
+            const body = document.getElementById('ordersTableBody');
+            body.innerHTML = '';
+
+            if(data.orders.length === 0) {
+                body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#a1a8b5;">Bekleyen herhangi bir işlem yok.</td></tr>';
+                return;
+            }
+
+            data.orders.forEach(o => {
+                const statusText = o.status === 'Waiting' ? '<span style="color:#f0ad4e; font-weight:bold;">KOD BEKLİYOR</span>' : '<span style="color:#5cb85c; font-weight:bold;">TAMAMLANDI</span>';
+                body.innerHTML += `
+                    <tr>
+                        <td>${o.id}</td>
+                        <td>${o.userEmail}</td>
+                        <td style="color:#00adb5; font-weight:bold;">${o.serviceName}</td>
+                        <td style="font-weight:bold; font-size:11pt;">${o.number}</td>
+                        <td>${o.time}</td>
+                        <td>${statusText}</td>
+                        <td><input type="text" id="code-${o.id}" class="inp" style="width:110px;" value="${o.smsCode || ''}" placeholder="Kod"></td>
+                        <td><button class="btn btn-success" onclick="submitCode('${o.id}')">Kodu Gönder</button></td>
+                    </tr>
+                `;
+            });
+        } catch(e){}
+    }
+
+    async function updateBalance(userId) {
+        const val = document.getElementById(`bal-${userId}`).value;
+        await fetch('/api/admin/update-balance', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ userId, amount: val })
+        });
+    }
+
+    async function toggleBan(userId) {
+        await fetch('/api/admin/toggle-ban', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ userId })
+        });
+    }
+
+    async function deleteUser(userId) {
+        if(confirm('Bu kullanıcıyı tamamen silmek istediğinize emin misiniz?')) {
+            await fetch('/api/admin/delete-user', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ userId })
+            });
+        }
     }
 
     async function submitCode(orderId) {
-        const codeVal = document.getElementById(`input-${orderId}`).value;
-        if(!codeVal) return alert('Lütfen önce geçerli bir kod yazın!');
-        
-        try {
-            const res = await fetch('/api/admin/set-code', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ orderId, smsCode: codeVal })
-            });
-            const data = await res.json();
-            if(data.success) {
-                loadAdminOrders();
-            }
-        } catch(e){ alert('Kod gönderim hatası!'); }
+        const codeVal = document.getElementById(`code-${orderId}`).value;
+        await fetch('/api/admin/set-code', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ orderId, smsCode: codeVal })
+        });
     }
 </script>
 </body>
