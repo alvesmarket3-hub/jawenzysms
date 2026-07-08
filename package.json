@@ -1,7 +1,7 @@
 {
   "name": "verifypro-sms-sistemi",
   "version": "1.0.0",
-  "description": "SMS Onay ve Altyapı Yönetim Paneli",
+  "description": "SMS Onay Altyapı Sistemi",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
