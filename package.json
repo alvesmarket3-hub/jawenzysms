@@ -1,7 +1,7 @@
 {
   "name": "verifypro-sms-sistemi",
   "version": "1.0.0",
-  "description": "SMS Onay Altyapı Sistemi",
+  "description": "VerifyPro SMS Dağıtım ve Bakiye Kontrol Sistemi",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
