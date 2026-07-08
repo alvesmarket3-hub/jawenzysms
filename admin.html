@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerifyPro - Global Master Admin Control</title>
+    <title>VerifyPro - Global Master Executive Panel</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 10.5pt; }
-        .container { max-width: 1250px; margin: 30px auto; padding: 20px; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 20px; }
         .panel-header { background-color: #141b2d; border-left: 5px solid #ff5c5c; padding: 20px; border-radius: 4px; margin-bottom: 30px; }
         .section-title { font-size: 14pt; font-weight: bold; margin: 30px 0 15px 0; color: #ff5c5c; border-bottom: 1px solid #1f2940; padding-bottom: 8px; }
         
@@ -21,32 +21,45 @@
         .btn-warn { background-color: #f0ad4e; color: white; }
         
         .inp { background: #0b0f19; border: 1px solid #2e3b52; color: #fff; padding: 6px; border-radius: 4px; font-weight: bold; }
+
+        /* Gelişmiş Chat Odaları Tasarımı */
+        .chat-system-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; background-color: #141b2d; border-radius: 6px; border: 1px solid #1f2940; height: 400px; overflow: hidden; }
+        .chat-users-sidebar { background-color: #111625; border-right: 1px solid #1f2940; overflow-y: auto; padding: 10px; }
+        .chat-user-tab { padding: 12px; border-radius: 4px; cursor: pointer; margin-bottom: 8px; border: 1px solid #1f2940; background:#141b2d; font-size: 9.5pt; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-user-tab:hover, .chat-user-tab.active { border-color: #ff5c5c; background-color: #1f2940; }
+        .chat-main-area { display: flex; flex-direction: column; height: 100%; }
+        .chat-body { flex: 1; padding: 15px; overflow-y: auto; font-size: 10pt; }
+        .chat-footer { background-color: #0b0f19; display: flex; border-top: 1px solid #1f2940; }
+        .chat-footer input { flex: 1; background: transparent; border: none; padding: 15px; color: white; outline: none; }
+        .chat-footer button { background: #ff5c5c; border: none; color: white; padding: 0 25px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="container">
 
     <div class="panel-header">
-        <div style="font-size:16pt; font-weight:bold; color:#ff5c5c;">🛠️ VERIFYPRO CENTRAL EXECUTIVE PANEL</div>
-        <div style="color:#a1a8b5; font-size:9.5pt; margin-top:4px;">Tüm kullanıcı üyeliklerini, banlama işlemlerini, bakiyeleri ve SMS onay isteklerini buradan anlık yönetin.</div>
+        <div style="font-size:16pt; font-weight:bold; color:#ff5c5c;">🛠️ VERIFYPRO GLOBAL MANAGEMENT HUB</div>
+        <div style="color:#a1a8b5; font-size:9.5pt; margin-top:4px;">Yönetici Paneli: Kullanıcılar, SMS Kod İstekleri ve Ayrı Odalı Canlı Destek Sistemi.</div>
     </div>
 
-    <div class="section-title">👥 Kayıtlı Üyelerin Yönetimi (Müşteri Listesi)</div>
+    <!-- MÜŞTERİ YÖNETİMİ -->
+    <div class="section-title">👥 Kayıtlı Üyelerin Yönetimi</div>
     <table class="admin-table">
         <thead>
             <tr>
                 <th>Üye ID</th>
-                <th>E-Posta Adresi</th>
-                <th>Mevcut Bakiye (₺)</th>
+                <th>Müşteri E-Posta</th>
+                <th>Mevcut Bakiye</th>
                 <th>Durum</th>
-                <th>Bakiye Değiştir</th>
+                <th>Bakiye Düzenle</th>
                 <th>Hesap Aksiyonları</th>
             </tr>
         </thead>
         <tbody id="usersTableBody"></tbody>
     </table>
 
-    <div class="section-title">📱 Gelen Canlı SMS Talepleri & Kod İletme</div>
+    <!-- SMS KOD YÖNETİMİ -->
+    <div class="section-title">📱 Canlı SMS Talepleri ve Anlık Kod İletme</div>
     <table class="admin-table">
         <thead>
             <tr>
@@ -62,16 +75,37 @@
         </thead>
         <tbody id="ordersTableBody"></tbody>
     </table>
+
+    <!-- KULLANICI BAZLI DESTEK SİSTEMİ -->
+    <div class="section-title">💬 Kullanıcı Bazlı Canlı Destek Odaları</div>
+    <div class="chat-system-grid">
+        <div class="chat-users-sidebar" id="chatUsersList">
+            <!-- Odalar buraya düşecek -->
+        </div>
+        <div class="chat-main-area">
+            <div class="chat-body" id="adminChatBox">
+                <div style="text-align:center; color:#a1a8b5; margin-top:150px;">Lütfen mesajlaşmak istediğiniz kullanıcı odasını soldan seçin.</div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="adminChatInput" placeholder="Kullanıcıya yanıt yazın..." disabled>
+                <button id="adminChatSendBtn" onclick="sendAdminMessage()" disabled>Cevapla</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    // Canlı Senkronizasyon Döngüsü
+    let selectedUserChat = null;
+    let allChatsRaw = [];
+
     initAdmin();
     setInterval(initAdmin, 2500);
 
     function initAdmin() {
         loadUsers();
         loadOrders();
+        loadAllChats();
     }
 
     async function loadUsers() {
@@ -113,7 +147,7 @@
             body.innerHTML = '';
 
             if(data.orders.length === 0) {
-                body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#a1a8b5;">Bekleyen herhangi bir işlem yok.</td></tr>';
+                body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#a1a8b5;">Bekleyen SMS isteği yok.</td></tr>';
                 return;
             }
 
@@ -124,7 +158,7 @@
                         <td>${o.id}</td>
                         <td>${o.userEmail}</td>
                         <td style="color:#00adb5; font-weight:bold;">${o.serviceName}</td>
-                        <td style="font-weight:bold; font-size:11pt;">${o.number}</td>
+                        <td style="font-weight:bold;">${o.number}</td>
                         <td>${o.time}</td>
                         <td>${statusText}</td>
                         <td><input type="text" id="code-${o.id}" class="inp" style="width:110px;" value="${o.smsCode || ''}" placeholder="Kod"></td>
@@ -135,6 +169,71 @@
         } catch(e){}
     }
 
+    async function loadAllChats() {
+        try {
+            const res = await fetch('/api/chats');
+            const data = await res.json();
+            allChatsRaw = data.chats;
+
+            // Benzersiz kullanıcı odalarını filtrele
+            const uniqueEmails = [...new Set(allChatsRaw.map(c => c.userEmail))];
+            
+            const sidebar = document.getElementById('chatUsersList');
+            sidebar.innerHTML = '';
+            
+            uniqueEmails.forEach(email => {
+                const activeClass = selectedUserChat === email ? 'active' : '';
+                sidebar.innerHTML += `<div class="chat-user-tab ${activeClass}" onclick="selectChatRoom('${email}')">👤 ${email}</div>`;
+            });
+
+            if (selectedUserChat) {
+                renderActiveChatRoom();
+            }
+        } catch(e){}
+    }
+
+    function selectChatRoom(email) {
+        selectedUserChat = email;
+        document.getElementById('adminChatInput').disabled = false;
+        document.getElementById('adminChatSendBtn').disabled = false;
+        
+        // Aktif tab görselini güncelle
+        const tabs = document.querySelectorAll('.chat-user-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        
+        renderActiveChatRoom();
+    }
+
+    function renderActiveChatRoom() {
+        const box = document.getElementById('adminChatBox');
+        box.innerHTML = '';
+        
+        const roomChats = allChatsRaw.filter(c => c.userEmail === selectedUserChat);
+        roomChats.forEach(c => {
+            let nameColor = "#00adb5";
+            if(c.sender === "Yönetici") nameColor = "#ff5c5c";
+            if(c.sender === "Sistem") nameColor = "#f0ad4e";
+            
+            box.innerHTML += `<div style="margin-bottom:8px;"><span style="color:${nameColor}; font-weight:bold;">[${c.time}] ${c.sender}:</span> ${c.text}</div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendAdminMessage() {
+        const inp = document.getElementById('adminChatInput');
+        if(!inp.value.trim() || !selectedUserChat) return;
+        
+        try {
+            await fetch('/api/chats/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ userEmail: selectedUserChat, sender: 'Yönetici', text: inp.value })
+            });
+            inp.value = '';
+            loadAllChats();
+        } catch(e){}
+    }
+
     async function updateBalance(userId) {
         const val = document.getElementById(`bal-${userId}`).value;
         await fetch('/api/admin/update-balance', {
@@ -142,6 +241,7 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ userId, amount: val })
         });
+        initAdmin();
     }
 
     async function toggleBan(userId) {
@@ -150,15 +250,19 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ userId })
         });
+        initAdmin();
     }
 
     async function deleteUser(userId) {
-        if(confirm('Bu kullanıcıyı tamamen silmek istediğinize emin misiniz?')) {
+        if(confirm('Kullanıcıyı ve ilişkili tüm chat geçmişini kalıcı olarak silmek istiyor musunuz?')) {
             await fetch('/api/admin/delete-user', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ userId })
             });
+            selectedUserChat = null;
+            document.getElementById('adminChatBox').innerHTML = '<div style="text-align:center; color:#a1a8b5; margin-top:150px;">Kullanıcı silindi. Yeni oda seçin.</div>';
+            initAdmin();
         }
     }
 
@@ -169,6 +273,7 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ orderId, smsCode: codeVal })
         });
+        initAdmin();
     }
 </script>
 </body>
