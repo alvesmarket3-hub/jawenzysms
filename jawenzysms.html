@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sms Onay Altyapı Sistemi</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            background-color: #060b13; color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 25px; }
+        
+        /* Navbar Alanı */
+        .header {
+            background-color: #091220; border: 1px solid #14233c;
+            padding: 15px 25px; border-radius: 8px; margin-bottom: 25px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-size: 16pt; font-weight: bold; color: #ffffff; }
+        .logo span { color: #00adb5; }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .balance-badge {
+            background-color: #112239; border-left: 4px solid #00adb5;
+            padding: 10px 18px; border-radius: 4px; font-weight: bold; font-size: 11pt;
+        }
+        .btn {
+            background-color: transparent; border: 1px solid #142d4c;
+            color: #8fa0b5; padding: 10px 20px; border-radius: 6px;
+            font-weight: 500; cursor: pointer; transition: 0.2s; text-decoration: none;
+        }
+        .btn:hover { border-color: #00adb5; color: #ffffff; }
+        .btn-primary { background-color: #00adb5; border-color: #00adb5; color: #060b13; font-weight: bold; }
+        .btn-primary:hover { background-color: #00e5ff; color: #060b13; }
+        .btn-danger { background-color: #d9534f; border-color: #d9534f; color: white; }
+
+        /* Bildirim Şeridi */
+        .alert-box { padding: 15px; border-radius: 6px; margin-bottom: 25px; display: none; font-weight: bold; text-align: center; }
+        .alert-error { background-color: rgba(217, 83, 79, 0.15); border: 1px solid #d9534f; color: #ff5c5c; }
+        .alert-success { background-color: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; color: #2ecc71; }
+
+        /* Auth Modülü */
+        .auth-card {
+            max-width: 450px; margin: 60px auto; background-color: #091220;
+            border: 1px solid #14233c; padding: 35px; border-radius: 10px; text-align: center;
+        }
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #14233c; }
+        .tab { flex: 1; padding: 10px; cursor: pointer; color: #8fa0b5; font-weight: bold; }
+        .tab.active { color: #00adb5; border-bottom: 2px solid #00adb5; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-size: 10pt; color: #8fa0b5; margin-bottom: 6px; }
+        .form-control {
+            width: 100%; background-color: #060b13; border: 1px solid #142d4c;
+            border-radius: 6px; padding: 12px; color: #ffffff; font-size: 11pt; outline: none;
+        }
+        .form-control:focus { border-color: #00adb5; }
+
+        /* Kurumsal Paketler Grid (2x2) */
+        .section-title { font-size: 16pt; font-weight: bold; margin: 40px 0 10px 0; border-left: 4px solid #00adb5; padding-left: 10px; }
+        .packages-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 40px; }
+        .package-card {
+            background-color: #091220; border: 1px solid #14233c; border-radius: 8px;
+            padding: 30px; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .package-title { font-size: 14pt; font-weight: bold; color: #00adb5; margin-bottom: 10px; }
+        .package-desc { color: #798ea4; font-size: 10pt; line-height: 1.5; margin-bottom: 20px; }
+        .package-price { font-size: 22pt; font-weight: bold; margin-bottom: 15px; }
+
+        /* Tekli Numara Pazaryeri Grid (4 Kolon) */
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+        .service-item {
+            background-color: #091220; border: 1px solid #14233c; border-radius: 8px;
+            padding: 25px 15px; text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .service-item:hover { border-color: #00adb5; transform: translateY(-2px); }
+        .service-icon { font-size: 24pt; margin-bottom: 10px; }
+        .service-name { font-size: 12pt; font-weight: bold; margin-bottom: 5px; }
+        .service-price { color: #00adb5; font-weight: bold; }
+
+        /* Aktif Siparişler Havuzu */
+        .orders-container { background-color: #091220; border: 1px solid #14233c; border-radius: 8px; padding: 25px; margin-bottom: 40px; }
+        .order-row {
+            background-color: #060b13; border: 1px solid #142d4c; border-radius: 6px;
+            padding: 15px 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .num-display { font-size: 14pt; font-weight: bold; color: #00adb5; font-family: monospace; }
+        .timer { background: #112239; border: 1px solid #00adb5; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 10pt; }
+
+        /* Admin Paneli */
+        .admin-section { background-color: #091220; border: 1px solid #d9534f; border-radius: 8px; padding: 30px; margin-top: 50px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid #14233c; }
+        .admin-table th { background-color: #060b13; color: #8fa0b5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">VERIFY<span>PRO</span></div>
+        <div class="nav-right">
+            <div class="balance-badge" id="balanceDisplay">Bakiye: 0.00 ₺</div>
+            <button class="btn" id="logoutBtn" style="display:none;" onclick="logout()">Çıkış Yap</button>
+            <button class="btn btn-danger" id="adminToggleBtn" style="display:none;" onclick="toggleAdmin()">Yönetim Paneli</button>
+        </div>
+    </div>
+
+    <div id="systemAlert" class="alert-box"></div>
+
+    <div id="authArea" class="auth-card">
+        <div class="tabs">
+            <div class="tab active" id="loginTab" onclick="switchAuth('login')">Giriş Yap</div>
+            <div class="tab" id="registerTab" onclick="switchAuth('register')">Kayıt Ol</div>
+        </div>
+        <div class="form-group">
+            <label>E-Posta Adresiniz</label>
+            <input type="email" id="emailInput" class="form-control" placeholder="isim@domain.com">
+        </div>
+        <div class="form-group">
+            <label>Şifreniz</label>
+            <input type="password" id="passwordInput" class="form-control" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary" style="width:100%; margin-top:10px;" id="authSubmitBtn" onclick="handleAuth()">Sisteme Giriş Yap</button>
+    </div>
+
+    <div id="dashboardArea" style="display:none;">
+        
+        <div class="section-title">📦 Kurumsal Paketler (Teslimat Canlı Destektendir)</div>
+        <div class="packages-grid">
+            <div class="package-card">
+                <div>
+                    <div class="package-title">WhatsApp + Telegram Paketi</div>
+                    <div class="package-desc">Kurumsal iletişim için iki platform tek çatı altında. Bu pakette numara otomatik atanmaz.</div>
+                </div>
+                <div>
+                    <div class="package-price">89.99 ₺</div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="buyPackage('WhatsApp + Telegram Paketi', 89.99)">Satın Al</button>
+                </div>
+            </div>
+            <div class="package-card">
+                <div>
+                    <div class="package-title">Sadece WhatsApp Paketi</div>
+                    <div class="package-desc">Yüksek kaliteli kurumsal WhatsApp onay kodu altyapısı.</div>
+                </div>
+                <div>
+                    <div class="package-price">49.99 ₺</div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="buyPackage('Sadece WhatsApp Paketi', 49.99)">Satın Al</button>
+                </div>
+            </div>
+            <div class="package-card">
+                <div>
+                    <div class="package-title">Sadece Telegram Paketi</div>
+                    <div class="package-desc">Kanallar ve gruplar için güvenli toplu Telegram hesap doğrulama paketi.</div>
+                </div>
+                <div>
+                    <div class="package-price">39.99 ₺</div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="buyPackage('Sadece Telegram Paketi', 39.99)">Satın Al</button>
+                </div>
+            </div>
+            <div class="package-card">
+                <div>
+                    <div class="package-title">Premium Global SMS Paketi</div>
+                    <div class="package-desc">Yurt dışı lokasyonlu özel servislerin tamamında geçerli API hakkı.</div>
+                </div>
+                <div>
+                    <div class="package-price">24.99 ₺</div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="buyPackage('Premium Global SMS Paketi', 24.99)">Satın Al</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">🔢 Tekli Otomatik Numara Havuzu</div>
+        <div class="services-grid">
+            <div class="service-item" onclick="buySingleNumber('WhatsApp', 24.99)">
+                <div class="service-icon">💬</div>
+                <div class="service-name">WhatsApp</div>
+                <div class="service-price">24.99 ₺</div>
+            </div>
+            <div class="service-item" onclick="buySingleNumber('Telegram', 24.99)">
+                <div class="service-icon">✈️</div>
+                <div class="service-name">Telegram</div>
+                <div class="service-price">24.99 ₺</div>
+            </div>
+            <div class="service-item" onclick="buySingleNumber('Instagram', 24.99)">
+                <div class="service-icon">📸</div>
+                <div class="service-name">Instagram</div>
+                <div class="service-price">24.99 ₺</div>
+            </div>
+            <div class="service-item" onclick="buySingleNumber('Apple ID', 24.99)">
+                <div class="service-icon">🍎</div>
+                <div class="service-name">Apple ID</div>
+                <div class="service-price">24.99 ₺</div>
+            </div>
+        </div>
+
+        <div class="section-title">📱 Aktif Bekleyen SMS Onay Kodlarınız</div>
+        <div class="orders-container" id="activeOrdersPool">
+            <div style="text-align:center; color:#557193;">Şu an aktif bekleyen bir SMS onay işleminiz yoktur.</div>
+        </div>
+    </div>
+
+    <div id="adminArea" class="admin-section" style="display:none;">
+        <div style="font-size:14pt; font-weight:bold; color:#d9534f;">Yönetici Kontrol Merkezi</div>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>E-Posta</th>
+                    <th>Bakiye</th>
+                    <th>Rol</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody id="adminUserList"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let authMode = 'login';
+    let userSession = null;
+
+    function showAlert(text, type='success') {
+        const box = document.getElementById('systemAlert');
+        box.className = `alert-box alert-${type}`;
+        box.innerText = text;
+        box.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchAuth(mode) {
+        authMode = mode;
+        document.getElementById('loginTab').className = mode === 'login' ? 'tab active' : 'tab';
+        document.getElementById('registerTab').className = mode === 'register' ? 'tab active' : 'tab';
+        document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'Sisteme Giriş Yap' : 'Yeni Hesap Oluştur';
+    }
+
+    async function handleAuth() {
+        const email = document.getElementById('emailInput').value;
+        const password = document.getElementById('passwordInput').value;
+        
+        const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showAlert(data.message, 'success');
+            if(authMode === 'login') {
+                userSession = data.user;
+                initDashboard();
+            } else {
+                switchAuth('login');
+            }
+        } else {
+            showAlert(data.message, 'error');
+        }
+    }
+
+    function initDashboard() {
+        document.getElementById('authArea').style.display = 'none';
+        document.getElementById('dashboardArea').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        document.getElementById('balanceDisplay').innerText = `Bakiye: ${userSession.balance.toFixed(2)} ₺`;
+        
+        if(userSession.is_admin) {
+            document.getElementById('adminToggleBtn').style.display = 'inline-block';
+            loadAdminData();
+        }
+    }
+
+    async function buyPackage(name, price) {
+        if(userSession.balance < price) {
+            showAlert(`❌ HATA: Bakiyeniz yetersiz! Gerekli: ${price} ₺, Mevcut: ${userSession.balance.toFixed(2)} ₺`, 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/purchase', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email: userSession.email, price, type: 'package' })
+        });
+        const data = await res.json();
+        
+        userSession.balance = data.newBalance;
+        document.getElementById('balanceDisplay').innerText = `Bakiye: ${userSession.balance.toFixed(2)} ₺`;
+        showAlert(`✓ BAŞARILI: ${name} satın alındı! Bu işlem için otomatik numara atanmaz. Teslimat için lütfen Canlı Destek ile görüşün.`, 'success');
+    }
+
+    async function buySingleNumber(name, price) {
+        if(userSession.balance < price) {
+            showAlert(`❌ HATA: Bakiyeniz yetersiz! Otomatik numara çekmek için en az ${price} ₺ bakiyeniz olmalıdır.`, 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/purchase', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email: userSession.email, price, type: 'single' })
+        });
+        const data = await res.json();
+        
+        userSession.balance = data.newBalance;
+        document.getElementById('balanceDisplay').innerText = `Bakiye: ${userSession.balance.toFixed(2)} ₺`;
+        
+        const pool = document.getElementById('activeOrdersPool');
+        const randomNum = "+90 53" + Math.floor(2 + Math.random() * 8) + " " + Math.floor(100 + Math.random() * 900) + " " + Math.floor(10 + Math.random() * 90) + " " + Math.floor(10 + Math.random() * 90);
+        
+        pool.innerHTML = `
+            <div class="order-row">
+                <div>
+                    <strong>${name} Otomatik Numara</strong><br>
+                    <span class="num-display">${randomNum}</span>
+                </div>
+                <div style="text-align:right;">
+                    <span class="timer">20:00</span><br>
+                    <span style="color:#2ecc71; font-size:9pt; display:block; margin-top:5px;">SMS Kodu Bekleniyor...</span>
+                </div>
+            </div>
+        ` + (pool.innerHTML.includes('yoktur') ? '' : pool.innerHTML);
+        
+        showAlert(`✓ BAŞARILI: ${name} için otomatik sanal numara havuzdan başarıyla rezerve edildi.`, 'success');
+    }
+
+    async function loadAdminData() {
+        const res = await fetch('/api/admin/users');
+        const data = await res.json();
+        const tbody = document.getElementById('adminUserList');
+        tbody.innerHTML = '';
+        data.users.forEach(u => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${u.email}</td>
+                    <td>${u.balance.toFixed(2)} ₺</td>
+                    <td>${u.is_admin ? 'Admin' : 'Müşteri'}</td>
+                    <td><button class="btn" onclick="addAdminBalance('${u.email}')">+100 ₺ Ekle</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    async function addAdminBalance(email) {
+        const res = await fetch('/api/admin/add-balance', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, amount: 100 })
+        });
+        const data = await res.json();
+        if(data.success) {
+            if(userSession.email === email) {
+                userSession.balance = data.newBalance;
+                document.getElementById('balanceDisplay').innerText = `Bakiye: ${userSession.balance.toFixed(2)} ₺`;
+            }
+            loadAdminData();
+            showAlert("Kullanıcıya manuel 100 ₺ bakiye tanımlandı.");
+        }
+    }
+
+    function toggleAdmin() {
+        const x = document.getElementById('adminArea');
+        x.style.display = x.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function logout() {
+        location.reload();
+    }
+</script>
+</body>
+</html>
