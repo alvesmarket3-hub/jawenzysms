@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerifyPro - Kurumsal SMS Onay Altyapısı</title>
+    <title>VerifyPro - Kurumsal SMS Altyapısı</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; background-color: #060b13; color: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 11pt; }
@@ -15,32 +15,31 @@
         .section-title { text-align: center; font-size: 15pt; font-weight: bold; margin: 30px 0 5px 0; color: #fff; }
         .section-subtitle { text-align: center; font-size: 9.5pt; color: #557193; margin-bottom: 25px; }
         
-        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 40px; }
-        .service-item { background-color: #091220; border: 1px solid #14233c; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .service-item:hover { border-color: #00adb5; transform: translateY(-2px); }
-        .service-img { font-size: 22pt; margin-bottom: 8px; }
-        .service-price { color: #00adb5; font-weight: bold; }
+        .services-grid, .packages-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 40px; }
+        .service-item, .package-item { background-color: #091220; border: 1px solid #14233c; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .service-item:hover, .package-item:hover { border-color: #00adb5; transform: translateY(-2px); }
+        .service-img, .package-img { font-size: 22pt; margin-bottom: 8px; }
+        .service-price, .package-price { color: #00adb5; font-weight: bold; font-size: 13pt; }
         
-        /* Aktif Siparişler Havuzu */
         .orders-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
         .order-card { border: 1px solid #142d4c; border-radius: 8px; padding: 20px; background-color: #070e1a; text-align: center; }
         .number-box { background-color: rgba(0, 173, 181, 0.05); border: 1px solid rgba(0, 173, 181, 0.2); border-radius: 6px; padding: 10px; font-size: 13pt; font-weight: bold; color: #00adb5; margin: 10px 0; }
-        .code-box { background-color: #2ecc71; color: #060b13; padding: 10px; font-size: 15pt; font-weight: bold; border-radius: 6px; margin-top: 10px; letter-spacing: 2px; box-shadow: 0 0 10px rgba(46,204,113,0.3); }
+        .code-box { background-color: #2ecc71; color: #060b13; padding: 10px; font-size: 15pt; font-weight: bold; border-radius: 6px; margin-top: 10px; letter-spacing: 2px; }
 
-        /* Canlı Destek Alanı */
-        .chat-container { background-color: #091220; border: 1px solid #14233c; border-radius: 8px; max-width: 600px; margin: 0 auto 40px auto; overflow: hidden; }
-        .chat-messages { height: 200px; padding: 15px; overflow-y: auto; font-size: 10pt; }
-        .msg-line { margin-bottom: 8px; }
+        .chat-container { background-color: #091220; border: 1px solid #14233c; border-radius: 8px; max-width: 700px; margin: 0 auto 40px auto; overflow: hidden; }
+        .chat-messages { height: 260px; padding: 15px; overflow-y: auto; font-size: 10pt; border-bottom: 1px solid #14233c; }
+        .msg-line { margin-bottom: 10px; line-height: 1.4; }
         .msg-sender { color: #00adb5; font-weight: bold; }
+        .msg-admin { color: #ff5c5c; font-weight: bold; }
+        .msg-system { color: #f0ad4e; font-style: italic; }
         .chat-input-table { width: 100%; border-collapse: collapse; background-color: #060b13; }
-        .chat-input { width: 100%; background: transparent; border: none; padding: 12px; color: white; outline: none; }
-        .chat-send { background: #00adb5; border: none; color: #060b13; padding: 12px 20px; font-weight: bold; cursor: pointer; }
+        .chat-input { width: 100%; background: transparent; border: none; padding: 14px; color: white; outline: none; }
+        .chat-send { background: #00adb5; border: none; color: #060b13; padding: 0 25px; font-weight: bold; cursor: pointer; height: 100%; }
 
-        /* Giriş / Kayıt Ortak Ekranı */
-        .auth-container { max-width: 450px; margin: 60px auto; background-color: #091220; padding: 30px; border-radius: 8px; border: 1px solid #14233c; }
+        .auth-container { max-width: 450px; margin: 80px auto; background-color: #091220; padding: 30px; border-radius: 8px; border: 1px solid #14233c; }
         .form-control { width: 100%; background-color: #060b13; border: 1px solid #142d4c; border-radius: 6px; padding: 12px; color: white; margin-bottom: 15px; outline: none; }
         .action-btn { display: block; width: 100%; background-color: #00adb5; color: #060b13; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .alert-box { padding: 12px; border-radius: 6px; margin-bottom: 20px; display: none; text-align: center; font-weight: bold; font-size: 10pt; }
+        .alert-box { padding: 12px; border-radius: 6px; margin-bottom: 20px; display: none; text-align: center; font-weight: bold; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; min-width: 300px; }
         .alert-error { background-color: #d9534f; color: white; }
         .alert-success { background-color: #2ecc71; color: #060b13; }
     </style>
@@ -52,13 +51,14 @@
         <table style="width:100%">
             <tr>
                 <td style="font-size:16pt; font-weight:bold;">VERIFY<span style="color:#00adb5;">PRO</span></td>
-                <td style="text-align:right;"><div class="balance-badge" id="balanceDisplay">Bakiye: Giriş Bekleniyor</div></td>
+                <td style="text-align:right;"><div class="balance-badge" id="balanceDisplay">Giriş Yapın</div></td>
             </tr>
         </table>
     </div>
 
     <div id="systemAlert" class="alert-box alert-error"></div>
 
+    <!-- Giriş / Kayıt Paneli -->
     <div id="authPanel" class="auth-container">
         <div style="font-size:14pt; font-weight:bold; text-align:center; margin-bottom:20px; color:#00adb5;" id="authTitle">Hesabınıza Giriş Yapın</div>
         <input type="email" id="authEmail" class="form-control" placeholder="E-Posta Adresiniz">
@@ -70,14 +70,15 @@
         </div>
     </div>
 
+    <!-- Ana Dashboard -->
     <div id="mainDashboard" style="display:none;">
         <div class="hero">
             <h1>Kurumsal <span>SMS Onay</span> Altyapısı</h1>
-            <p>Servis seçtiğiniz an bakiyenizden düşer ve sipariş havuzuna aktarılır.</p>
+            <p>Güvenli, hızlı ve tamamen otomatik panel modülleri.</p>
         </div>
 
-        <div class="section-title">🔢 Bir Platform Seçin</div>
-        <div class="section-subtitle">Tıklama yaptığınız an bakiyeniz güncellenir ve sistem numarası atanır</div>
+        <div class="section-title">🔢 1. Platform Seçin ve SMS Alın</div>
+        <div class="section-subtitle">Tıkladığınız an bakiyenizden düşer ve havuzda numaranız listelenir.</div>
         <div class="services-grid">
             <div class="service-item" onclick="buyItem(35.00, 'WhatsApp')">
                 <div class="service-img">💬</div><div>WhatsApp</div><div class="service-price">35.00 ₺</div>
@@ -93,18 +94,22 @@
             </div>
         </div>
 
-        <div class="section-title">📱 Sipariş Havuzunuz ve Gelen SMS Kodları</div>
-        <div class="section-subtitle">Admin kod girişi yaptığı anda sayfa yenilenmeden buraya yansır</div>
+        <div class="section-title">📱 2. Sipariş Havuzunuz ve Gelen Kodlar</div>
+        <div class="section-subtitle">Admin panelden kod girildiği anda sayfa yenilenmeden buraya yansır.</div>
         <div class="orders-grid" id="ordersContainer"></div>
 
-        <div class="section-title">💬 Canlı Destek & Duyurular</div>
-        <div class="section-subtitle">Yöneticilerle anlık mesajlaşma paneli</div>
+        <div class="section-title">💳 3. Bakiye Yükleme Paketleri</div>
+        <div class="section-subtitle">İhtiyacınıza uygun paketi seçerek anında bakiye ekleyebilirsiniz.</div>
+        <div class="packages-grid" id="packagesContainer"></div>
+
+        <div class="section-title">💬 4. Canlı Destek & Bildirim Merkezi</div>
+        <div class="section-subtitle">Yöneticilerle gerçek zamanlı çift yönlü konuşma alanı.</div>
         <div class="chat-container">
             <div class="chat-messages" id="chatBox"></div>
             <table class="chat-input-table">
                 <tr>
-                    <td><input type="text" id="chatInput" class="chat-input" placeholder="Mesajınızı veya bakiye yükleme talebinizi yazın..."></td>
-                    <td style="width:80px;"><button class="chat-send" onclick="sendChatMessage()">Gönder</button></td>
+                    <td><input type="text" id="chatInput" class="chat-input" placeholder="Mesajınızı buraya yazın..."></td>
+                    <td style="width:90px; height: 100%;"><button class="chat-send" onclick="sendChatMessage()">Gönder</button></td>
                 </tr>
             </table>
         </div>
@@ -141,23 +146,71 @@
                 body: JSON.stringify({ email, password })
             });
             const data = await res.json();
-            if(!res.ok) return showAlert(data.message || 'Hata oluştu!', 'error');
+            if(!res.ok) return showAlert(data.message || 'Hata!', 'error');
             
             if(data.success) {
                 sessionUser = data.user;
                 document.getElementById('authPanel').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
-                document.getElementById('balanceDisplay').innerText = `Bakiye: ${sessionUser.balance.toFixed(2)} ₺`;
                 
-                loadOrders(); loadChats();
+                updateProfileData();
+                loadPackages();
+                
+                setInterval(updateProfileData, 3000);
                 setInterval(loadOrders, 2000);
                 setInterval(loadChats, 2000);
             } else { showAlert(data.message, 'error'); }
-        } catch(e) { showAlert('Bağlantı Hatası!', 'error'); }
+        } catch(e) { showAlert('Bağlantı sorunu!', 'error'); }
+    }
+
+    async function updateProfileData() {
+        try {
+            const res = await fetch(`/api/user/profile?email=${encodeURIComponent(sessionUser.email)}`);
+            const data = await res.json();
+            if(data.success) {
+                if(data.isBanned) { location.reload(); }
+                sessionUser.balance = data.balance;
+                document.getElementById('balanceDisplay').innerText = `Bakiye: ${data.balance.toFixed(2)} ₺`;
+            }
+        } catch(e){}
+    }
+
+    async function loadPackages() {
+        try {
+            const res = await fetch('/api/packages');
+            const data = await res.json();
+            const container = document.getElementById('packagesContainer');
+            container.innerHTML = '';
+            data.packages.forEach(p => {
+                container.innerHTML += `
+                    <div class="package-item" onclick="buyPackage('${p.id}')">
+                        <div class="package-img">💳</div>
+                        <div style="font-weight:bold; margin-bottom:5px;">${p.name}</div>
+                        <div style="font-size:9.5pt; color:#557193; margin-bottom:8px;">+${p.bakiye} ₺ Yüklenir</div>
+                        <div class="package-price">${p.price}.00 ₺</div>
+                    </div>
+                `;
+            });
+        } catch(e){}
+    }
+
+    async function buyPackage(packageId) {
+        try {
+            const res = await fetch('/api/packages/buy', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: sessionUser.email, packageId })
+            });
+            const data = await res.json();
+            if(data.success) {
+                showAlert('✓ Paket başarıyla satın alındı, bakiye eklendi!', 'success');
+                updateProfileData();
+            }
+        } catch(e){}
     }
 
     async function buyItem(price, serviceName) {
-        if (sessionUser.balance < price) return showAlert('❌ Bakiyeniz yetersiz! Lütfen chat üzerinden bakiye talep edin.', 'error');
+        if (sessionUser.balance < price) return showAlert('❌ Bakiyeniz yetersiz! Lütfen bakiye yükleyin.', 'error');
         try {
             const res = await fetch('/api/purchase', {
                 method: 'POST',
@@ -166,11 +219,9 @@
             });
             const data = await res.json();
             if(data.success) {
-                sessionUser.balance = data.newBalance;
-                document.getElementById('balanceDisplay').innerText = `Bakiye: ${sessionUser.balance.toFixed(2)} ₺`;
-                showAlert('✓ Sipariş oluşturuldu, SMS kodu bekleniyor...', 'success');
+                showAlert('✓ Sipariş oluşturuldu, kod bekleniyor...', 'success');
                 loadOrders();
-            }
+            } else { showAlert(data.message, 'error'); }
         } catch(e) {}
     }
 
@@ -181,22 +232,21 @@
             const container = document.getElementById('ordersContainer');
             container.innerHTML = '';
             
-            // Sadece bu kullanıcıya ait siparişleri süz
-            const myOrders = data.orders.filter(o => o.userEmail === sessionUser.email);
+            const myOrders = data.orders.filter(o => o.userEmail.toLowerCase() === sessionUser.email.toLowerCase());
             if(myOrders.length === 0) {
-                container.innerHTML = '<div style="grid-column:span 3; text-align:center; color:#557193; padding:20px;">Henüz aktif numara siparişiniz bulunmuyor.</div>';
+                container.innerHTML = '<div style="grid-column:span 3; text-align:center; color:#557193; padding:20px;">Aktif kod isteğiniz bulunmuyor.</div>';
                 return;
             }
 
             myOrders.forEach(o => {
                 let codeHtml = `<div style="color:#798ea4; font-size:10pt;">⏳ KOD BEKLENİYOR...</div>`;
                 if(o.smsCode) {
-                    codeHtml = `<div style="font-size:9pt; color:#2ecc71; margin-bottom:3px; font-weight:bold;">GELEN SMS KODU:</div><div class="code-box">${o.smsCode}</div>`;
+                    codeHtml = `<div style="font-size:9pt; color:#2ecc71; margin-bottom:3px; font-weight:bold;">GELEN KOD:</div><div class="code-box">${o.smsCode}</div>`;
                 }
                 container.innerHTML += `
                     <div class="order-card">
                         <div style="font-weight:bold; color:#00adb5; font-size:12pt;">${o.serviceName}</div>
-                        <div style="font-size:8.5pt; color:#557193; margin:4px 0;">İstek Saati: ${o.time}</div>
+                        <div style="font-size:8.5pt; color:#557193; margin:4px 0;">Saat: ${o.time}</div>
                         <div class="number-box">${o.number}</div>
                         ${codeHtml}
                     </div>
@@ -207,24 +257,34 @@
 
     async function loadChats() {
         try {
-            const res = await fetch('/api/chats');
+            const res = await fetch(`/api/chats?email=${encodeURIComponent(sessionUser.email)}`);
             const data = await res.json();
             const box = document.getElementById('chatBox');
+            
+            // Kullanıcı aşağıda yazıyorsa otomatik kaydırmayı bozmamak için pozisyon kontrolü
+            const shouldScroll = box.scrollTop + box.clientHeight >= box.scrollHeight - 20;
+            
             box.innerHTML = '';
             data.chats.forEach(c => {
-                box.innerHTML += `<div class="msg-line"><span class="msg-sender">[${c.time}] ${c.sender}:</span> ${c.text}</div>`;
+                let senderClass = "msg-sender";
+                if(c.sender === "Yönetici") senderClass = "msg-admin";
+                if(c.sender === "Sistem") senderClass = "msg-system";
+                
+                box.innerHTML += `<div class="msg-line"><span class="${senderClass}">[${c.time}] ${c.sender}:</span> ${c.text}</div>`;
             });
+            
+            if(shouldScroll) box.scrollTop = box.scrollHeight;
         } catch(e){}
     }
 
     async function sendChatMessage() {
         const inp = document.getElementById('chatInput');
-        if(!inp.value) return;
+        if(!inp.value.trim()) return;
         try {
             await fetch('/api/chats/send', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ sender: sessionUser.email, text: inp.value })
+                body: JSON.stringify({ userEmail: sessionUser.email, sender: sessionUser.email, text: inp.value })
             });
             inp.value = ''; loadChats();
         } catch(e){}
