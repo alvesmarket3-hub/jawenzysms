@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerifyPro - Kurumsal SMS Onay Paneli</title>
+    <title>VerifyPro - Kurumsal SMS Onay Altyapısı</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; background-color: #060b13; color: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 11pt; }
@@ -12,26 +12,37 @@
         .balance-badge { display: inline-block; background-color: #112239; border-left: 4px solid #00adb5; padding: 8px 14px; border-radius: 4px; font-weight: bold; }
         .hero { text-align: center; padding: 20px; }
         .hero h1 span { color: #00adb5; }
-        .section-title { text-align: center; font-size: 16pt; font-weight: bold; margin: 30px 0 5px 0; }
+        .section-title { text-align: center; font-size: 15pt; font-weight: bold; margin: 30px 0 5px 0; color: #fff; }
+        .section-subtitle { text-align: center; font-size: 9.5pt; color: #557193; margin-bottom: 25px; }
+        
         .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 40px; }
         .service-item { background-color: #091220; border: 1px solid #14233c; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
         .service-item:hover { border-color: #00adb5; transform: translateY(-2px); }
         .service-img { font-size: 22pt; margin-bottom: 8px; }
         .service-price { color: #00adb5; font-weight: bold; }
         
-        .active-orders-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
-        .order-card { border: 1px solid #142d4c; border-radius: 8px; padding: 20px; background-color: #070e1a; text-align: center; position: relative; }
-        .number-box { background-color: rgba(0, 173, 181, 0.05); border: 1px solid rgba(0, 173, 181, 0.2); border-radius: 6px; padding: 12px; font-size: 14pt; font-weight: bold; color: #00adb5; margin: 10px 0; }
-        .code-box { background-color: #2ecc71; color: #060b13; padding: 10px; font-size: 16pt; font-weight: bold; border-radius: 6px; margin-top: 10px; letter-spacing: 2px; box-shadow: 0 0 10px rgba(46,204,113,0.4); }
-        
-        .auth-box { max-width: 400px; margin: 80px auto; background-color: #091220; padding: 30px; border-radius: 8px; border: 1px solid #14233c; }
-        .form-control { width: 100%; background-color: #060b13; border: 1px solid #142d4c; border-radius: 6px; padding: 12px; color: white; margin-bottom: 15px; }
+        /* Aktif Siparişler Havuzu */
+        .orders-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
+        .order-card { border: 1px solid #142d4c; border-radius: 8px; padding: 20px; background-color: #070e1a; text-align: center; }
+        .number-box { background-color: rgba(0, 173, 181, 0.05); border: 1px solid rgba(0, 173, 181, 0.2); border-radius: 6px; padding: 10px; font-size: 13pt; font-weight: bold; color: #00adb5; margin: 10px 0; }
+        .code-box { background-color: #2ecc71; color: #060b13; padding: 10px; font-size: 15pt; font-weight: bold; border-radius: 6px; margin-top: 10px; letter-spacing: 2px; box-shadow: 0 0 10px rgba(46,204,113,0.3); }
+
+        /* Canlı Destek Alanı */
+        .chat-container { background-color: #091220; border: 1px solid #14233c; border-radius: 8px; max-width: 600px; margin: 0 auto 40px auto; overflow: hidden; }
+        .chat-messages { height: 200px; padding: 15px; overflow-y: auto; font-size: 10pt; }
+        .msg-line { margin-bottom: 8px; }
+        .msg-sender { color: #00adb5; font-weight: bold; }
+        .chat-input-table { width: 100%; border-collapse: collapse; background-color: #060b13; }
+        .chat-input { width: 100%; background: transparent; border: none; padding: 12px; color: white; outline: none; }
+        .chat-send { background: #00adb5; border: none; color: #060b13; padding: 12px 20px; font-weight: bold; cursor: pointer; }
+
+        /* Giriş / Kayıt Ortak Ekranı */
+        .auth-container { max-width: 450px; margin: 60px auto; background-color: #091220; padding: 30px; border-radius: 8px; border: 1px solid #14233c; }
+        .form-control { width: 100%; background-color: #060b13; border: 1px solid #142d4c; border-radius: 6px; padding: 12px; color: white; margin-bottom: 15px; outline: none; }
         .action-btn { display: block; width: 100%; background-color: #00adb5; color: #060b13; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .alert-box { padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; text-align: center; font-weight: bold; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999; min-width: 300px; }
+        .alert-box { padding: 12px; border-radius: 6px; margin-bottom: 20px; display: none; text-align: center; font-weight: bold; font-size: 10pt; }
         .alert-error { background-color: #d9534f; color: white; }
         .alert-success { background-color: #2ecc71; color: #060b13; }
-        .loader { border: 3px solid #14233c; border-top: 3px solid #00adb5; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -41,80 +52,112 @@
         <table style="width:100%">
             <tr>
                 <td style="font-size:16pt; font-weight:bold;">VERIFY<span style="color:#00adb5;">PRO</span></td>
-                <td style="text-align:right;"><div class="balance-badge" id="balanceDisplay">Bakiye: Giriş Yapın</div></td>
+                <td style="text-align:right;"><div class="balance-badge" id="balanceDisplay">Bakiye: Giriş Bekleniyor</div></td>
             </tr>
         </table>
     </div>
 
     <div id="systemAlert" class="alert-box alert-error"></div>
 
-    <div id="authPanel" class="auth-box">
-        <div style="font-size:14pt; font-weight:bold; text-align:center; margin-bottom:20px; color:#00adb5;">Müşteri Girişi</div>
-        <input type="email" id="authEmail" class="form-control" value="demo@verifypro.com">
-        <input type="password" id="authPass" class="form-control" value="password123">
-        <button class="action-btn" onclick="handleLogin()">Giriş Yap</button>
+    <div id="authPanel" class="auth-container">
+        <div style="font-size:14pt; font-weight:bold; text-align:center; margin-bottom:20px; color:#00adb5;" id="authTitle">Hesabınıza Giriş Yapın</div>
+        <input type="email" id="authEmail" class="form-control" placeholder="E-Posta Adresiniz">
+        <input type="password" id="authPass" class="form-control" placeholder="Şifreniz">
+        <button class="action-btn" id="authSubmitBtn" onclick="handleAuth()">Giriş Yap</button>
+        <div style="text-align:center; margin-top:15px; font-size:9.5pt; color:#557193;">
+            <span id="authToggleText">Henüz hesabınız yok mu?</span> 
+            <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authLink" style="color:#00adb5; text-decoration:none; font-weight:bold;">Kayıt Ol</a>
+        </div>
     </div>
 
     <div id="mainDashboard" style="display:none;">
         <div class="hero">
-            <h1>Kurumsal <span>SMS Onay</span> Paneli</h1>
-            <p>İstediğiniz servisi seçin, kodunuz yönetici panelinden onaylandığı an burada belirecektir.</p>
+            <h1>Kurumsal <span>SMS Onay</span> Altyapısı</h1>
+            <p>Servis seçtiğiniz an bakiyenizden düşer ve sipariş havuzuna aktarılır.</p>
         </div>
 
-        <div class="section-title">🔢 Platform Seçin ve SMS Alın</div>
+        <div class="section-title">🔢 Bir Platform Seçin</div>
+        <div class="section-subtitle">Tıklama yaptığınız an bakiyeniz güncellenir ve sistem numarası atanır</div>
         <div class="services-grid">
-            <div class="service-item" onclick="buyItem(25.00, 'WhatsApp')">
-                <div class="service-img">💬</div><div>WhatsApp</div><div class="service-price">25.00 ₺</div>
+            <div class="service-item" onclick="buyItem(35.00, 'WhatsApp')">
+                <div class="service-img">💬</div><div>WhatsApp</div><div class="service-price">35.00 ₺</div>
             </div>
-            <div class="service-item" onclick="buyItem(20.00, 'Telegram')">
-                <div class="service-img">✈️</div><div>Telegram</div><div class="service-price">20.00 ₺</div>
+            <div class="service-item" onclick="buyItem(25.00, 'Telegram')">
+                <div class="service-img">✈️</div><div>Telegram</div><div class="service-price">25.00 ₺</div>
             </div>
             <div class="service-item" onclick="buyItem(15.00, 'Instagram')">
                 <div class="service-img">📸</div><div>Instagram</div><div class="service-price">15.00 ₺</div>
             </div>
-            <div class="service-item" onclick="buyItem(30.00, 'Apple ID')">
-                <div class="service-img">🍎</div><div>Apple ID</div><div class="service-price">30.00 ₺</div>
+            <div class="service-item" onclick="buyItem(40.00, 'Apple ID')">
+                <div class="service-img">🍎</div><div>Apple ID</div><div class="service-price">40.00 ₺</div>
             </div>
         </div>
 
-        <div class="section-title">📱 Aktif Numaralarınız & SMS Kodları</div>
-        <div class="active-orders-grid" id="ordersContainer"></div>
+        <div class="section-title">📱 Sipariş Havuzunuz ve Gelen SMS Kodları</div>
+        <div class="section-subtitle">Admin kod girişi yaptığı anda sayfa yenilenmeden buraya yansır</div>
+        <div class="orders-grid" id="ordersContainer"></div>
+
+        <div class="section-title">💬 Canlı Destek & Duyurular</div>
+        <div class="section-subtitle">Yöneticilerle anlık mesajlaşma paneli</div>
+        <div class="chat-container">
+            <div class="chat-messages" id="chatBox"></div>
+            <table class="chat-input-table">
+                <tr>
+                    <td><input type="text" id="chatInput" class="chat-input" placeholder="Mesajınızı veya bakiye yükleme talebinizi yazın..."></td>
+                    <td style="width:80px;"><button class="chat-send" onclick="sendChatMessage()">Gönder</button></td>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
     let sessionUser = null;
+    let isRegisterMode = false;
 
     function showAlert(text, type='success') {
         const box = document.getElementById('systemAlert');
         box.className = `alert-box alert-${type}`; box.innerText = text; box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 4000);
+        setTimeout(() => box.style.display = 'none', 3500);
     }
 
-    async function handleLogin() {
+    function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById('authTitle').innerText = isRegisterMode ? 'Yeni Hesap Oluşturun' : 'Hesabınıza Giriş Yapın';
+        document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Kayıt Ol' : 'Giriş Yap';
+        document.getElementById('authToggleText').innerText = isRegisterMode ? 'Zaten hesabınız var mı?' : 'Henüz hesabınız yok mu?';
+        document.getElementById('authLink').innerText = isRegisterMode ? 'Giriş Yap' : 'Kayıt Ol';
+    }
+
+    async function handleAuth() {
         const email = document.getElementById('authEmail').value;
         const password = document.getElementById('authPass').value;
+        const targetUrl = isRegisterMode ? '/api/auth/register' : '/api/auth/login';
+        
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch(targetUrl, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ email, password })
             });
             const data = await res.json();
+            if(!res.ok) return showAlert(data.message || 'Hata oluştu!', 'error');
+            
             if(data.success) {
                 sessionUser = data.user;
                 document.getElementById('authPanel').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
                 document.getElementById('balanceDisplay').innerText = `Bakiye: ${sessionUser.balance.toFixed(2)} ₺`;
                 
-                loadOrders();
-                setInterval(loadOrders, 2000); // Her 2 saniyede bir kod kontrolü yap
-            }
-        } catch(e) { showAlert('Giriş başarısız!', 'error'); }
+                loadOrders(); loadChats();
+                setInterval(loadOrders, 2000);
+                setInterval(loadChats, 2000);
+            } else { showAlert(data.message, 'error'); }
+        } catch(e) { showAlert('Bağlantı Hatası!', 'error'); }
     }
 
     async function buyItem(price, serviceName) {
-        if (sessionUser.balance < price) return showAlert('❌ Bakiyeniz yetersiz!', 'error');
+        if (sessionUser.balance < price) return showAlert('❌ Bakiyeniz yetersiz! Lütfen chat üzerinden bakiye talep edin.', 'error');
         try {
             const res = await fetch('/api/purchase', {
                 method: 'POST',
@@ -125,36 +168,65 @@
             if(data.success) {
                 sessionUser.balance = data.newBalance;
                 document.getElementById('balanceDisplay').innerText = `Bakiye: ${sessionUser.balance.toFixed(2)} ₺`;
-                showAlert('✓ Sipariş başarıyla oluşturuldu!', 'success');
+                showAlert('✓ Sipariş oluşturuldu, SMS kodu bekleniyor...', 'success');
                 loadOrders();
             }
-        } catch(e) { showAlert('İşlem hatası!', 'error'); }
+        } catch(e) {}
     }
 
     async function loadOrders() {
         try {
             const res = await fetch('/api/orders');
             const data = await res.json();
-            if(!data.success) return;
-
             const container = document.getElementById('ordersContainer');
             container.innerHTML = '';
-            if(data.orders.length === 0) container.innerHTML = '<div style="grid-column:span 3; text-align:center; color:#557193; padding:20px;">Henüz aktif bir numaranız yok.</div>';
             
-            data.orders.forEach(o => {
-                let codeHtml = `<div style="color:#798ea4; font-size:10pt;"><div class="loader"></div>KOD BEKLENİYOR...</div>`;
+            // Sadece bu kullanıcıya ait siparişleri süz
+            const myOrders = data.orders.filter(o => o.userEmail === sessionUser.email);
+            if(myOrders.length === 0) {
+                container.innerHTML = '<div style="grid-column:span 3; text-align:center; color:#557193; padding:20px;">Henüz aktif numara siparişiniz bulunmuyor.</div>';
+                return;
+            }
+
+            myOrders.forEach(o => {
+                let codeHtml = `<div style="color:#798ea4; font-size:10pt;">⏳ KOD BEKLENİYOR...</div>`;
                 if(o.smsCode) {
-                    codeHtml = `<div style="font-size:9pt; color:#2ecc71; margin-bottom:4px; font-weight:bold;">GELEN KOD:</div><div class="code-box">${o.smsCode}</div>`;
+                    codeHtml = `<div style="font-size:9pt; color:#2ecc71; margin-bottom:3px; font-weight:bold;">GELEN SMS KODU:</div><div class="code-box">${o.smsCode}</div>`;
                 }
                 container.innerHTML += `
                     <div class="order-card">
-                        <div style="font-weight:bold; color:#00adb5; font-size:12pt; margin-bottom:5px;">${o.serviceName}</div>
-                        <div style="font-size:9pt; color:#557193; margin-bottom:5px;">Saat: ${o.date}</div>
+                        <div style="font-weight:bold; color:#00adb5; font-size:12pt;">${o.serviceName}</div>
+                        <div style="font-size:8.5pt; color:#557193; margin:4px 0;">İstek Saati: ${o.time}</div>
                         <div class="number-box">${o.number}</div>
                         ${codeHtml}
                     </div>
                 `;
             });
+        } catch(e){}
+    }
+
+    async function loadChats() {
+        try {
+            const res = await fetch('/api/chats');
+            const data = await res.json();
+            const box = document.getElementById('chatBox');
+            box.innerHTML = '';
+            data.chats.forEach(c => {
+                box.innerHTML += `<div class="msg-line"><span class="msg-sender">[${c.time}] ${c.sender}:</span> ${c.text}</div>`;
+            });
+        } catch(e){}
+    }
+
+    async function sendChatMessage() {
+        const inp = document.getElementById('chatInput');
+        if(!inp.value) return;
+        try {
+            await fetch('/api/chats/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ sender: sessionUser.email, text: inp.value })
+            });
+            inp.value = ''; loadChats();
         } catch(e){}
     }
 </script>
