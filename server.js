@@ -1,5 +1,5 @@
 /**
- * VerifyPro - SMS Dağıtım ve Bakiye Doğrulama API Katmanı
+ * VerifyPro - SMS Dağıtım, Bakiye Doğrulama ve Web Sunucu Katmanı
  * Dil: Node.js (Express)
  */
 
@@ -8,10 +8,18 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+// Railway'in otomatik port ataması için process.env.PORT eklenmiştir
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Sitenin açılması için gerekli olan yönlendirmeler (Cannot GET / Çözümü)
+app.use(express.static(__dirname));
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
 // Bellek içi güvenli veritabanı yapısı
 let users = [
@@ -70,4 +78,5 @@ app.post('/api/admin/add-balance', (req, res) => {
     res.status(404).json({ success: false });
 });
 
-app.listen(PORT, () => console.log(`Sunucu http://localhost:${PORT} üzerinde hazır.`));
+// Sunucuyu başlat
+app.listen(PORT, () => console.log(`Sunucu port ${PORT} üzerinde hazır.`));
